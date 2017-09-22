@@ -1,0 +1,18 @@
+name: "default"
+language: "fr"
+title: "admin"
+akas:
+  - "master"
+  - "admin"
+security_level: 999
+restAPI_password: "fakepass"
+pmdl: "trigger/snowboy/resources/kalliope-FR-20samples.pmdl"
+tts:
+  name: 'pico2wave'
+  parameters:
+    language: "fr-FR"
+    cache: True
+neurons_parameters:
+  neuron_name:
+    params1: "foo"
+    params2: "bar"

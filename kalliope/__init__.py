@@ -22,6 +22,9 @@ from kalliope.core.ResourcesManager import ResourcesManager
 from kalliope.core.SynapseLauncher import SynapseLauncher
 from kalliope.core.OrderAnalyser import OrderAnalyser
 
+from kalliope.core.ConfigurationManager.UserLoader import UserLoader
+from kalliope.core.Utils.UserContext import UserContext
+
 logging.basicConfig()
 logger = logging.getLogger("kalliope")
 
@@ -91,6 +94,11 @@ def main():
     if parser.brain_file:
         brain_file = parser.brain_file
 
+    # check if user set a user path
+    user_path = None
+    if parser.brain_file:
+        user_path = parser.user_path
+
     # check the user provide a valid action
     if parser.action not in ACTION_LIST:
         Utils.print_warning("%s is not a recognised action\n" % parser.action)
@@ -135,6 +143,9 @@ def main():
     # load the brain once
     brain_loader = BrainLoader(file_path=brain_file)
     brain = brain_loader.brain
+
+    # load users once
+    user_loader = UserLoader(user_path)
 
     # load settings
     # get global configuration once
@@ -192,6 +203,8 @@ def main():
 
     if parser.action == "gui":
         try:
+            # Set default user
+            UserContext.setUser(user_loader.getUser(0))
             ShellGui(brain=brain)
         except (KeyboardInterrupt, SystemExit):
             Utils.print_info("Ctrl+C pressed. Killing Kalliope")

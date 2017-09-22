@@ -6,6 +6,7 @@ from kalliope import Utils
 from kalliope.trigger.snowboy import snowboydecoder
 from cffi import FFI as _FFI
 
+from kalliope.core.ConfigurationManager.UserLoader import UserLoader
 
 class SnowboyModelNotFounfd(Exception):
     pass
@@ -40,13 +41,22 @@ class Snowboy(Thread):
         if self.pmdl is None:
             raise MissingParameterException("Pmdl file is required with snowboy")
 
-        self.pmdl_path = Utils.get_real_file_path(self.pmdl)
-        if not os.path.isfile(self.pmdl_path):
-            raise SnowboyModelNotFounfd("The snowboy model file %s does not exist" % self.pmdl_path)
+        self.callbacks = []
+        self.pmdl_path = []
+
+        users = UserLoader().list()
+
+        for user in users :
+            pmdl = user.get("pmdl")
+            path = Utils.get_real_file_path(pmdl)
+            if not os.path.isfile(path):
+                raise SnowboyModelNotFounfd("The snowboy model file %s does not exist" %path )
+            self.pmdl_path.append( path )
+            self.callbacks.append(self.callback)
 
         self.detector = snowboydecoder.HotwordDetector(self.pmdl_path,
                                                        sensitivity=self.sensitivity,
-                                                       detected_callback=self.callback,
+                                                       detected_callback=self.callbacks,
                                                        interrupt_check=self.interrupt_callback,
                                                        sleep_time=0.03)
 
@@ -84,7 +94,7 @@ class Snowboy(Thread):
     def stop(self):
         """
         Kill the snowboy process
-        :return: 
+        :return:
         """
         logger.debug("Killing snowboy process")
         self.interrupted = True

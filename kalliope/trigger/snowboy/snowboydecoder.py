@@ -9,6 +9,9 @@ import time
 import os
 import logging
 
+from kalliope.core.Utils.UserContext import UserContext
+from kalliope.core.ConfigurationManager.UserLoader import UserLoader
+
 logging.basicConfig()
 logger = logging.getLogger("kalliope")
 TOP_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -144,10 +147,12 @@ class HotwordDetector(Thread):
                 if ans == -1:
                     logger.warning("Error initializing streams or reading audio data")
                 elif ans > 0:
-                    message = "Keyword " + str(ans) + " detected at time: "
+                    user = UserLoader().getUser(ans-1)
+                    message = "Keyword for user " + user.get('name') + " detected at time: "
                     message += time.strftime("%Y-%m-%d %H:%M:%S",
                                              time.localtime(time.time()))
-                    logger.debug(message)
+                    logger.info(message)
+                    UserContext.setUser( user )
                     callback = self.detected_callback[ans-1]
                     if callback is not None:
                         callback()

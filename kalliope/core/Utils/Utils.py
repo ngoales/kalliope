@@ -158,7 +158,7 @@ class Utils(object):
         return parent_path
 
     @classmethod
-    def get_real_file_path(cls, file_path_to_test):
+    def get_real_file_path(cls, file_path_to_test, dir = False):
         """
         Try to return a full path from a given <file_path_to_test>
         If the path is an absolute on, we return it directly.
@@ -173,7 +173,6 @@ class Utils(object):
         :type file_path_to_test: str
         :return: absolute path to the file file_path_to_test or None if is doen't exist
         """
-
         if not os.path.isabs(file_path_to_test):
             current_script_path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
             path_order = {
@@ -187,12 +186,12 @@ class Utils(object):
             for key in sorted(path_order):
                 new_file_path_to_test = path_order[key]
                 logger.debug("Try to load file from %s: %s" % (key, new_file_path_to_test))
-                if os.path.isfile(new_file_path_to_test):
+                if os.path.isfile(new_file_path_to_test) or dir and os.path.isdir(new_file_path_to_test) :
                     logger.debug("File found in %s" % new_file_path_to_test)
                     return new_file_path_to_test
 
         else:
-            if os.path.isfile(file_path_to_test):
+            if os.path.isfile(file_path_to_test or dir and os.path.isdir(new_file_path_to_test) ):
                 return file_path_to_test
             else:
                 return None

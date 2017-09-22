@@ -7,6 +7,8 @@ from kalliope.core.ConfigurationManager.SettingLoader import SettingLoader
 from kalliope.core.Cortex import Cortex
 from kalliope.core.Utils.Utils import Utils
 
+from kalliope.core.Utils.UserContext import UserContext
+
 logging.basicConfig()
 logger = logging.getLogger("kalliope")
 
@@ -51,11 +53,26 @@ class NeuronLauncher:
         if neuron.parameters is not None:
             try:
                 neuron.parameters = cls._replace_brackets_by_loaded_parameter(neuron.parameters, parameters_dict)
+                neuron.parameters = cls._override_parameter_with_user_preference(neuron)
             except NeuronParameterNotAvailable:
                 Utils.print_danger("The neuron %s cannot be launched" % neuron.name)
                 return None
         instantiated_neuron = NeuronLauncher.launch_neuron(neuron)
         return instantiated_neuron
+
+    @classmethod
+    def _override_parameter_with_user_preference(cls, neuron):
+        """
+        Receive initial dict parameter and override/create with user preferences
+        :param neuron: the neuron
+        """
+        neuron_parametres = neuron.parameters
+        user_parameters =  UserContext.getNeuronParameter( neuron.name )
+        if user_parameters is not None:
+            for key in user_parameters:
+                neuron_parametres[key] = user_parameters[key]
+                logger.debug("Add user preference \"%s\" to neuron \"%s\"" % (key, neuron.__str__()))
+        return neuron_parametres
 
     @classmethod
     def _replace_brackets_by_loaded_parameter(cls, neuron_parameters, loaded_parameters):
@@ -112,13 +129,13 @@ class NeuronLauncher:
     def _neuron_parameters_are_available_in_loaded_parameters(string_parameters, loaded_parameters):
         """
         Check that all parameters in brackets are available in the loaded_parameters dict
-        
+
         E.g:
         string_parameters = "this is a {{ parameter1 }}"
-        
+
         Will return true if the loaded_parameters looks like the following
-        loaded_parameters { "parameter1": "a value"}        
-        
+        loaded_parameters { "parameter1": "a value"}
+
         :param string_parameters: The string that contains one or more parameters in brace brackets
         :param loaded_parameters: Dict of parameter
         :return: True if all parameters in brackets have an existing key in loaded_parameters dict

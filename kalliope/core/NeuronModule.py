@@ -15,6 +15,8 @@ from kalliope.core.SynapseLauncher import SynapseLauncher
 from kalliope.core.Utils.RpiUtils import RpiUtils
 from kalliope.core.Utils.Utils import Utils
 
+from kalliope.core.Utils.UserContext import UserContext
+
 logging.basicConfig()
 logger = logging.getLogger("kalliope")
 
@@ -79,16 +81,15 @@ class NeuronModule(object):
 
         # create the TTS instance
         self.tts = None
-        if self.override_tts_parameters is None or not isinstance(self.override_tts_parameters, dict):
-            # we get the default TTS
+        user_tts = UserContext.getTTS();
+        if user_tts is None:
             self.tts = self._get_tts_object(settings=self.settings)
         else:
-            for key, value in self.override_tts_parameters.items():
-                tts_name = key
-                tts_parameters = value
-                self.tts = self._get_tts_object(tts_name=tts_name,
-                                                override_parameter=tts_parameters,
-                                                settings=self.settings)
+            tts_name = user_tts['name']
+            tts_parameters = user_tts['parameters']
+            self.tts = self._get_tts_object(tts_name=tts_name,
+                                            override_parameter=tts_parameters,
+                                            settings=self.settings)
 
         # get templates if provided
         # Check if there is a template associate to the output message
@@ -109,6 +110,8 @@ class NeuronModule(object):
         self.kalliope_memory = kwargs.get('kalliope_memory', None)
         # parameters loaded from the order can be save now
         Cortex.save_parameter_from_order_in_memory(self.kalliope_memory)
+        # User parameter
+        self.user_parameters = UserContext.getNeuronParameter(self.neuron_name)
 
     def __str__(self):
         retuned_string = ""

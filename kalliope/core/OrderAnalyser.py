@@ -7,6 +7,8 @@ from kalliope.core.Models.MatchedSynapse import MatchedSynapse
 from kalliope.core.Utils.Utils import Utils
 from kalliope.core.ConfigurationManager import SettingLoader
 
+from kalliope.core.Utils.UserContext import UserContext
+
 import logging
 
 logging.basicConfig()
@@ -63,10 +65,15 @@ class OrderAnalyser:
         # create a list of MatchedSynapse from the tuple list
         list_synapse_to_process = list()
         for tuple_el in list_match_synapse:
-            new_matching_synapse = MatchedSynapse(matched_synapse=tuple_el.synapse,
-                                                  matched_order=tuple_el.order,
-                                                  user_order=order)
-            list_synapse_to_process.append(new_matching_synapse)
+            if UserContext.isGranted(tuple_el.synapse):
+                new_matching_synapse = MatchedSynapse(matched_synapse=tuple_el.synapse,
+                                                      matched_order=tuple_el.order,
+                                                      user_order=order)
+            else:
+                unauthorized_synapse = brain.get_synapse_by_name(SettingLoader().settings.unauthorized_synapse)
+                new_matching_synapse = MatchedSynapse(matched_synapse=unauthorized_synapse,
+                                                      matched_order=None,
+                                                      user_order=order)
 
         return list_synapse_to_process
 

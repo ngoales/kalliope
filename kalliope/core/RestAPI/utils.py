@@ -3,6 +3,8 @@ from flask import request, Response
 
 from kalliope.core.ConfigurationManager import SettingLoader
 
+from kalliope.core.ConfigurationManager.UserLoader import UserLoader
+from kalliope.core.Utils.UserContext import UserContext
 
 def check_auth(username, password):
     """This function is called to check if a username /
@@ -10,7 +12,12 @@ def check_auth(username, password):
     """
     sl = SettingLoader()
     settings = sl.settings
-    return username == settings.rest_api.login and password == settings.rest_api.password
+
+    user = UserContext.getUserByIdentity( username )
+    if user is not None and password == user.get("restAPI_password") :
+        UserContext().setUser(user)
+        return True
+    return False
 
 
 def authenticate():
