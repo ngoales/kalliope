@@ -208,10 +208,10 @@ unauthorized_synapse: "unauthorized-synapse"
 # Specify behavior of security plugin
 # Accepted values:
 #   pass_all: no security enable
-#   rule: check if user can execute (allowed user and security level)
+#   rule: check if user can execute (security level)
 security_policy: "rule"
 
-# Default security level of neurons (if not set in neuro)
+# Default security level of neurons (if not set in neuron)
 # -1 : always authorized
 # [0-.]: define level
 

@@ -90,7 +90,11 @@ class BrainLoader(with_metaclass(Singleton, object)):
                     name = synapses_dict["name"]
                     neurons = self._get_neurons(synapses_dict["neurons"], self.settings)
                     signals = self._get_signals(synapses_dict["signals"])
-                    new_synapse = Synapse(name=name, neurons=neurons, signals=signals)
+
+                    security_level = self.settings.default_neuron_security_level
+                    if "security_level" in synapses_dict:
+                        security_level = synapses_dict["security_level"]
+                    new_synapse = Synapse(name=name, neurons=neurons, signals=signals, security_level=security_level)
                     synapses.append(new_synapse)
         brain.synapses = synapses
         if self.file_path is None:

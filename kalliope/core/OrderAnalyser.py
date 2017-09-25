@@ -75,6 +75,8 @@ class OrderAnalyser:
                                                       matched_order=None,
                                                       user_order=order)
 
+            list_synapse_to_process.append( new_matching_synapse )
+
         return list_synapse_to_process
 
     @classmethod

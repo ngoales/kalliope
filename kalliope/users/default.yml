@@ -4,9 +4,9 @@ title: "admin"
 akas:
   - "master"
   - "admin"
-security_level: 999
+security_level: 0
 restAPI_password: "fakepass"
-pmdl: "trigger/snowboy/resources/kalliope-FR-20samples.pmdl"
+pmdl: "trigger/snowboy/resources/aila.pmdl"
 tts:
   name: 'pico2wave'
   parameters:

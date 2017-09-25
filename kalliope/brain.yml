@@ -15,6 +15,14 @@
           message:
             - "Hello sir"
 
+  - name: "unauthorized-synapse"
+    signals:
+      - order: "unauthorized-synapse"
+    neurons:
+      - say:
+          message:
+            - "Vous ne disposez pas des droits nécéssaire"
+
   - name: "default-synapse"
     signals:
       - order: "default-synapse-order"
