@@ -5,10 +5,11 @@ class Synapse(object):
     .. note:: must be defined in the brain.yml
     """
 
-    def __init__(self, name=None, neurons=None, signals=None):
+    def __init__(self, name=None, neurons=None, signals=None, security_level=-1):
         self.name = name
         self.neurons = neurons
         self.signals = signals
+        self.security_level = security_level
 
     def serialize(self):
         """

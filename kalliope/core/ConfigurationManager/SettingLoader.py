@@ -119,6 +119,11 @@ class SettingLoader(with_metaclass(Singleton, object)):
         variables = self._get_variables(settings)
         rpi_settings = self._get_rpi_settings(settings)
 
+        # Get the security parameters
+        unauthorized_synapse = self._get_unauthorized_synapse(settings)
+        security_policy = self._get_security_policy(settings)
+        default_neuron_security_level = self._get_default_neuron_security_level(settings)
+
         # Load the setting singleton with the parameters
         setting_object.default_tts_name = default_tts_name
         setting_object.default_stt_name = default_stt_name
@@ -139,6 +144,10 @@ class SettingLoader(with_metaclass(Singleton, object)):
         setting_object.resources = resources
         setting_object.variables = variables
         setting_object.rpi_settings = rpi_settings
+
+        setting_object.unauthorized_synapse = unauthorized_synapse
+        setting_object.security_policy = security_policy
+        setting_object.default_neuron_security_level = default_neuron_security_level
 
         return setting_object
 
@@ -762,7 +771,7 @@ class SettingLoader(with_metaclass(Singleton, object)):
         """
         return RpiSettings object
         :param settings: The loaded YAML settings file
-        :return: 
+        :return:
         """
 
         try:
@@ -784,3 +793,105 @@ class SettingLoader(with_metaclass(Singleton, object)):
         except KeyError:
             logger.debug("[SettingsLoader] No Rpi config")
             return None
+
+
+    @staticmethod
+    def _get_unauthorized_synapse(settings):
+        """
+        Return the name of the unauthorized synapse
+
+        :param settings: The YAML settings file
+        :type settings: dict
+        :return: the unauthorized synapse name
+        :rtype: String
+
+        :Example:
+
+            unauthorized_synapse = cls._get_unauthorized_synapse(settings)
+
+        .. seealso::
+        .. raises:: SettingNotFound, NullSettingException, SettingInvalidException
+        .. warnings:: Class Method and Private
+        """
+
+        try:
+            unauthorized_synapse = settings["unauthorized_synapse"]
+            logger.debug("Unauthorized synapse: %s" % unauthorized_synapse)
+        except KeyError:
+            unauthorized_synapse = None
+
+        return unauthorized_synapse
+
+
+    @staticmethod
+    def _get_security_policy(settings):
+        """
+        Return the security policy level
+
+        :param settings: The YAML settings file
+        :type settings: dict
+        :return: the security policy name
+        :rtype: String
+
+        .. seealso::
+        .. raises:: SettingNotFound, NullSettingException, SettingInvalidException
+        .. warnings:: Class Method and Private
+        """
+
+        allowed_values = ["pass_all", "rule"]
+
+        try:
+            security_policy = settings["security_policy"]
+            if security_policy not in allowed_values:
+                raise SettingInvalidException( "%s is not allowed security policy" % security_policy )
+            logger.debug("Security Policy: %s" % security_policy)
+        except KeyError:
+            security_policy = "rule" # default policy is rule
+
+        return security_policy
+
+    @staticmethod
+    def _get_default_neuron_security_level(settings):
+        """
+        Return the default neuron security level
+
+        :param settings: The YAML settings file
+        :type settings: dict
+        :return: the security level
+        :rtype: integer
+
+        .. seealso::
+        .. raises:: SettingNotFound, NullSettingException, SettingInvalidException
+        .. warnings:: Class Method and Private
+        """
+
+        try:
+            security_level = settings["default_neuron_security_level"]
+            logger.debug("Default Neuron Security Level: %s" % security_level)
+        except KeyError:
+            security_level = 0 # default security level
+
+        return security_level
+
+    @staticmethod
+    def _get_default_user_security_level(settings):
+        """
+        Return the default user security level
+
+        :param settings: The YAML settings file
+        :type settings: dict
+        :return: the security level
+        :rtype: integer
+
+        .. seealso::
+        .. raises:: SettingNotFound, NullSettingException, SettingInvalidException
+        .. warnings:: Class Method and Private
+        """
+
+        try:
+            security_level = settings["default_user_security_level"]
+            logger.debug("Default Neuron Security Level: %s" % security_level)
+        except KeyError:
+            security_level = 0 # default security level
+
+        return security_level

@@ -202,3 +202,17 @@ default_synapse: "default-synapse"
 # ---------------------------
 # Users settings
 # ---------------------------
+# Specify an default unauthorized synapse response in case you are not allowed to execute the order.
+unauthorized_synapse: "unauthorized-synapse"
+
+# Specify behavior of security plugin
+# Accepted values:
+#   pass_all: no security enable
+#   rule: check if user can execute (allowed user and security level)
+security_policy: "rule"
+
+# Default security level of neurons (if not set in neuro)
+# -1 : always authorized
+# [0-.]: define level
+
+default_neuron_security_level: 0
