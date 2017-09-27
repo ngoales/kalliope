@@ -8,12 +8,16 @@ from cffi import FFI as _FFI
 
 from kalliope.core.ConfigurationManager.UserLoader import UserLoader
 
-class SnowboyModelNotFounfd(Exception):
+class SnowboyModelNotFound(Exception):
     pass
 
 
 class MissingParameterException(Exception):
     pass
+
+class SnowboyModelAlreadyUsedException(Exception):
+    pass
+
 
 logging.basicConfig()
 logger = logging.getLogger("kalliope")
@@ -37,9 +41,9 @@ class Snowboy(Thread):
             raise MissingParameterException("callback function is required with snowboy")
 
         # get the pmdl file to load
-        self.pmdl = kwargs.get('pmdl_file', None)
-        if self.pmdl is None:
-            raise MissingParameterException("Pmdl file is required with snowboy")
+        # self.pmdl = kwargs.get('pmdl_file', None)
+        # if self.pmdl is None:
+        #    raise MissingParameterException("Pmdl file is required with snowboy")
 
         self.callbacks = []
         self.pmdl_path = []
@@ -50,7 +54,9 @@ class Snowboy(Thread):
             pmdl = user.get("pmdl")
             path = Utils.get_real_file_path(pmdl)
             if not os.path.isfile(path):
-                raise SnowboyModelNotFounfd("The snowboy model file %s does not exist" %path )
+                raise SnowboyModelNotFound("The snowboy model file %s does not exist" %path )
+            if path in self.pmdl_path:
+                raise SnowboyModelAlreadyUsedException("The model file %s is already used for another user" %path)
             self.pmdl_path.append( path )
             self.callbacks.append(self.callback)
 
